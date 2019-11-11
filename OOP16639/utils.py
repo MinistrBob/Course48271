@@ -1,4 +1,5 @@
-from contracts import contract
+# from contracts import contract
+
 
 def factorize(n):
     """
@@ -20,7 +21,7 @@ def factorize(n):
 
 
 if __name__ == "__main__":
-    x = 77
+    x = 1
     # a, b = factorize(x)
     m = factorize(x)
     print(m)
