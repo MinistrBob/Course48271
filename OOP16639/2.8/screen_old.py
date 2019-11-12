@@ -8,40 +8,34 @@ import math
 SCREEN_DIM = (800, 600)
 
 
-class Vec2d:
+# =======================================================================================
+# Функции для работы с векторами
+# =======================================================================================
 
-    def __init__(self, v=(0, 0)):
-        """
-        Вектор определяется координатами x2, y2 — точка конца вектора.
-        Начало вектора всегда совпадает с центом координат (x1, y1)=(0, 0).
-        :param v:
-        """
-        if v is None:
-            self.x2 = float(0)
-            self.y2 = float(1)
-        self.x2 = float(v[0])
-        self.y2 = float(v[1])
+def sub(x, y):
+    """"возвращает разность двух векторов"""
+    return x[0] - y[0], x[1] - y[1]
 
-    def __add__(self, other):
-        """возвращает сумму двух векторов"""
-        return Vec2d((self.x2 + other.x2, self.y2 + other.y2))
 
-    def __sub__(self, other):
-        """"возвращает разность двух векторов"""
-        return Vec2d((self.x2 - other.x2, self.y2 - other.y2))
+def add(x, y):
+    """возвращает сумму двух векторов"""
+    return x[0] + y[0], x[1] + y[1]
 
-    def __mul__(self, k):
-        """возвращает произведение вектора на число"""
-        return Vec2d((self.x2 * k, self.y2 * k))
 
-    def __len__(self):
-        """возвращает длину вектора"""
-        return math.sqrt(self.x2 * self.x2 + self.y2 * self.y2)
+def length(x):
+    """возвращает длину вектора"""
+    return math.sqrt(x[0] * x[0] + x[1] * x[1])
 
-    def int_pair(self):
-        """возвращает пару координат, определяющих вектор (координаты точки конца вектора),
-        координаты начальной точки вектора совпадают с началом системы координат (0, 0)"""
-        return self.x2, self.y2
+
+def mul(v, k):
+    """возвращает произведение вектора на число"""
+    return v[0] * k, v[1] * k
+
+
+def vec(x, y):
+    """возвращает пару координат, определяющих вектор (координаты точки конца вектора),
+    координаты начальной точки вектора совпадают с началом системы координат (0, 0)"""
+    return sub(y, x)
 
 
 # =======================================================================================
@@ -52,13 +46,13 @@ def draw_points(points, style="points", width=3, color=(255, 255, 255)):
     if style == "line":
         for p_n in range(-1, len(points) - 1):
             pygame.draw.line(gameDisplay, color,
-                             (int(points[p_n].x2), int(points[p_n].y2)),
-                             (int(points[p_n + 1].x2), int(points[p_n + 1].y2)), width)
+                             (int(points[p_n][0]), int(points[p_n][1])),
+                             (int(points[p_n + 1][0]), int(points[p_n + 1][1])), width)
 
     elif style == "points":
         for p in points:
             pygame.draw.circle(gameDisplay, color,
-                               (int(p.x2), int(p.y2)), width)
+                               (int(p[0]), int(p[1])), width)
 
 
 def draw_help():
@@ -92,7 +86,7 @@ def get_point(points, alpha, deg=None):
         deg = len(points) - 1
     if deg == 0:
         return points[0]
-    return (points[deg] * alpha) + (get_point(points, alpha, deg - 1) * (1 - alpha))
+    return add(mul(points[deg], alpha), mul(get_point(points, alpha, deg - 1), 1 - alpha))
 
 
 def get_points(base_points, count):
@@ -109,9 +103,9 @@ def get_knot(points, count):
     res = []
     for i in range(-2, len(points) - 2):
         ptn = []
-        ptn.append((points[i] + points[i + 1]) * 0.5)
+        ptn.append(mul(add(points[i], points[i + 1]), 0.5))
         ptn.append(points[i + 1])
-        ptn.append((points[i + 1] + points[i + 2]) * 0.5)
+        ptn.append(mul(add(points[i + 1], points[i + 2]), 0.5))
 
         res.extend(get_points(ptn, count))
     return res
@@ -120,11 +114,11 @@ def get_knot(points, count):
 def set_points(points, speeds):
     """функция перерасчета координат опорных точек"""
     for p in range(len(points)):
-        points[p] = points[p] + speeds[p]
-        if points[p].x2 > SCREEN_DIM[0] or points[p].x2 < 0:
-            speeds[p] = Vec2d((- speeds[p].x2, speeds[p].y2))
-        if points[p].y2 > SCREEN_DIM[1] or points[p].y2 < 0:
-            speeds[p] = Vec2d((speeds[p].x2, -speeds[p].y2))
+        points[p] = add(points[p], speeds[p])
+        if points[p][0] > SCREEN_DIM[0] or points[p][0] < 0:
+            speeds[p] = (- speeds[p][0], speeds[p][1])
+        if points[p][1] > SCREEN_DIM[1] or points[p][1] < 0:
+            speeds[p] = (speeds[p][0], -speeds[p][1])
 
 
 # =======================================================================================
@@ -165,8 +159,8 @@ if __name__ == "__main__":
                     steps -= 1 if steps > 1 else 0
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                points.append(Vec2d(event.pos))
-                speeds.append(Vec2d((random.random() * 2, random.random() * 2)))
+                points.append(event.pos)
+                speeds.append((random.random() * 2, random.random() * 2))
 
         gameDisplay.fill((0, 0, 0))
         hue = (hue + 1) % 360
