@@ -44,44 +44,57 @@ class Vec2d:
         return self.x2, self.y2
 
 
+class Polyline:
+    """
+    Реализовать класс замкнутых ломаных Polyline с методами отвечающими за добавление в ломаную точки (Vec2d)
+    c её скоростью, пересчёт координат точек (set_points) и отрисовку ломаной (draw_points). Арифметические действия
+    с векторами должны быть реализованы с помощью операторов, а не через вызовы соответствующих методов.
+    """
+
+    def __init__(self, display):
+        self.display = display
+
+    def set_points(self, points, speeds):
+        """функция перерасчета координат опорных точек"""
+        for p in range(len(points)):
+            points[p] = points[p] + speeds[p]
+            if points[p].x2 > SCREEN_DIM[0] or points[p].x2 < 0:
+                speeds[p] = Vec2d((- speeds[p].x2, speeds[p].y2))
+            if points[p].y2 > SCREEN_DIM[1] or points[p].y2 < 0:
+                speeds[p] = Vec2d((speeds[p].x2, -speeds[p].y2))
+
+    def draw_points(self, points, style="points", width=3, color=(255, 255, 255)):
+        """функция отрисовки точек на экране"""
+        if style == "line":
+            for p_n in range(-1, len(points) - 1):
+                pygame.draw.line(self.display, color,
+                                 (int(points[p_n].x2), int(points[p_n].y2)),
+                                 (int(points[p_n + 1].x2), int(points[p_n + 1].y2)), width)
+        elif style == "points":
+            for p in points:
+                pygame.draw.circle(self.display, color,
+                                   (int(p.x2), int(p.y2)), width)
+
+    def draw_help(self):
+        """функция отрисовки экрана справки программы"""
+        self.display.fill((50, 50, 50))
+        font1 = pygame.font.SysFont("courier", 24)
+        font2 = pygame.font.SysFont("serif", 24)
+        data = [["F1", "Show Help"], ["R", "Restart"], ["P", "Pause/Play"], ["Num+", "More points"],
+                ["Num-", "Less points"], ["", ""], [str(steps), "Current points"]]
+
+        pygame.draw.lines(self.display, (255, 50, 50, 255), True, [
+            (0, 0), (800, 0), (800, 600), (0, 600)], 5)
+        for i, text in enumerate(data):
+            self.display.blit(font1.render(
+                text[0], True, (128, 128, 255)), (100, 100 + 30 * i))
+            self.display.blit(font2.render(
+                text[1], True, (128, 128, 255)), (200, 100 + 30 * i))
+
+
 # =======================================================================================
 # Функции отрисовки
 # =======================================================================================
-def draw_points(points, style="points", width=3, color=(255, 255, 255)):
-    """функция отрисовки точек на экране"""
-    if style == "line":
-        for p_n in range(-1, len(points) - 1):
-            pygame.draw.line(gameDisplay, color,
-                             (int(points[p_n].x2), int(points[p_n].y2)),
-                             (int(points[p_n + 1].x2), int(points[p_n + 1].y2)), width)
-
-    elif style == "points":
-        for p in points:
-            pygame.draw.circle(gameDisplay, color,
-                               (int(p.x2), int(p.y2)), width)
-
-
-def draw_help():
-    """функция отрисовки экрана справки программы"""
-    gameDisplay.fill((50, 50, 50))
-    font1 = pygame.font.SysFont("courier", 24)
-    font2 = pygame.font.SysFont("serif", 24)
-    data = []
-    data.append(["F1", "Show Help"])
-    data.append(["R", "Restart"])
-    data.append(["P", "Pause/Play"])
-    data.append(["Num+", "More points"])
-    data.append(["Num-", "Less points"])
-    data.append(["", ""])
-    data.append([str(steps), "Current points"])
-
-    pygame.draw.lines(gameDisplay, (255, 50, 50, 255), True, [
-        (0, 0), (800, 0), (800, 600), (0, 600)], 5)
-    for i, text in enumerate(data):
-        gameDisplay.blit(font1.render(
-            text[0], True, (128, 128, 255)), (100, 100 + 30 * i))
-        gameDisplay.blit(font2.render(
-            text[1], True, (128, 128, 255)), (200, 100 + 30 * i))
 
 
 # =======================================================================================
@@ -117,23 +130,15 @@ def get_knot(points, count):
     return res
 
 
-def set_points(points, speeds):
-    """функция перерасчета координат опорных точек"""
-    for p in range(len(points)):
-        points[p] = points[p] + speeds[p]
-        if points[p].x2 > SCREEN_DIM[0] or points[p].x2 < 0:
-            speeds[p] = Vec2d((- speeds[p].x2, speeds[p].y2))
-        if points[p].y2 > SCREEN_DIM[1] or points[p].y2 < 0:
-            speeds[p] = Vec2d((speeds[p].x2, -speeds[p].y2))
-
-
 # =======================================================================================
 # Основная программа
 # =======================================================================================
 if __name__ == "__main__":
     pygame.init()
-    gameDisplay = pygame.display.set_mode(SCREEN_DIM)
     pygame.display.set_caption("MyScreenSaver")
+
+    gameDisplay = pygame.display.set_mode(SCREEN_DIM)
+    pl = Polyline(gameDisplay)
 
     steps = 35
     working = True
@@ -171,12 +176,12 @@ if __name__ == "__main__":
         gameDisplay.fill((0, 0, 0))
         hue = (hue + 1) % 360
         color.hsla = (hue, 100, 50, 100)
-        draw_points(points)
-        draw_points(get_knot(points, steps), "line", 3, color)
+        pl.draw_points(points)
+        pl.draw_points(get_knot(points, steps), "line", 3, color)
         if not pause:
-            set_points(points, speeds)
+            pl.set_points(points, speeds)
         if show_help:
-            draw_help()
+            pl.draw_help()
 
         pygame.display.flip()
 
