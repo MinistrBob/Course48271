@@ -57,6 +57,10 @@ class Polyline:
         self.speeds = []
         self.steps = 35
 
+    def add_point(self, pos):
+        self.points.append(Vec2d(pos))
+        self.speeds.append(Vec2d((random.random() * 2, random.random() * 2)))
+
     def set_points(self):
         """функция перерасчета координат опорных точек"""
         for p in range(len(self.points)):
@@ -167,8 +171,7 @@ if __name__ == "__main__":
                     pl.steps -= 1 if pl.steps > 1 else 0
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pl.points.append(Vec2d(event.pos))
-                pl.speeds.append(Vec2d((random.random() * 2, random.random() * 2)))
+                pl.add_point(event.pos)
 
         gameDisplay.fill((0, 0, 0))
         hue = (hue + 1) % 360
