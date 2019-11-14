@@ -51,11 +51,11 @@ class Polyline:
     с векторами должны быть реализованы с помощью операторов, а не через вызовы соответствующих методов.
     """
 
-    def __init__(self, display):
+    def __init__(self, display, points, speeds, step):
         self.display = display
-        self.points = []
-        self.speeds = []
-        self.steps = 35
+        self.points = points
+        self.speeds = speeds
+        self.steps = step
 
     def add_point(self, pos):
         self.points.append(Vec2d(pos))
@@ -88,7 +88,7 @@ class Polyline:
         font1 = pygame.font.SysFont("courier", 24)
         font2 = pygame.font.SysFont("serif", 24)
         data = [["F1", "Show Help"], ["R", "Restart"], ["P", "Pause/Play"], ["Num+", "More points"],
-                ["Num-", "Less points"], ["", ""], [str(steps), "Current points"]]
+                ["Num-", "Less points"], ["", ""], [str(self.steps), "Current points"]]
 
         pygame.draw.lines(self.display, (255, 50, 50, 255), True, [
             (0, 0), (800, 0), (800, 600), (0, 600)], 5)
@@ -101,8 +101,11 @@ class Polyline:
 
 class Knot(Polyline):
 
-    def __init__(self):
-        pass
+    def __init__(self, display, points, speeds, step):
+        self.display = display
+        self.points = points
+        self.speeds = speeds
+        self.steps = step
 
     def get_point(self, points, alpha, deg=None):
         if deg is None:
@@ -140,9 +143,7 @@ if __name__ == "__main__":
     pygame.display.set_caption("MyScreenSaver")
 
     gameDisplay = pygame.display.set_mode(SCREEN_DIM)
-    pl = Polyline(gameDisplay)
-
-    k = Knot()
+    k = Knot(gameDisplay, [], [], 35)
 
     working = True
     show_help = False
@@ -159,29 +160,29 @@ if __name__ == "__main__":
                 if event.key == pygame.K_ESCAPE:
                     working = False
                 if event.key == pygame.K_r:
-                    points = []
-                    speeds = []
+                    k.points = []
+                    k.speeds = []
                 if event.key == pygame.K_p:
                     pause = not pause
                 if event.key == pygame.K_KP_PLUS:
-                    pl.steps += 1
+                    k.steps += 1
                 if event.key == pygame.K_F1:
                     show_help = not show_help
                 if event.key == pygame.K_KP_MINUS:
-                    pl.steps -= 1 if pl.steps > 1 else 0
+                    k.steps -= 1 if k.steps > 1 else 0
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pl.add_point(event.pos)
+                k.add_point(event.pos)
 
         gameDisplay.fill((0, 0, 0))
         hue = (hue + 1) % 360
         color.hsla = (hue, 100, 50, 100)
-        pl.draw_points(pl.points)
-        pl.draw_points(k.get_knot(pl.points, pl.steps), "line", 3, color)
+        k.draw_points(k.points)
+        k.draw_points(k.get_knot(k.points, k.steps), "line", 3, color)
         if not pause:
-            pl.set_points()
+            k.set_points()
         if show_help:
-            pl.draw_help()
+            k.draw_help()
 
         pygame.display.flip()
 
