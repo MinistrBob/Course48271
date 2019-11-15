@@ -4,6 +4,7 @@
 import pygame
 import random
 import math
+import time
 
 SCREEN_DIM = (800, 600)
 
@@ -88,7 +89,8 @@ class Polyline:
         font1 = pygame.font.SysFont("courier", 24)
         font2 = pygame.font.SysFont("serif", 24)
         data = [["F1", "Show Help"], ["R", "Restart"], ["P", "Pause/Play"], ["Num+", "More points"],
-                ["Num-", "Less points"], ["", ""], [str(self.steps), "Current points"]]
+                ["Num-", "Less points"], ["UP", "Fast"], ["DOWN", "Slow"],
+                ["", ""], [str(self.steps), "Current points"]]
 
         pygame.draw.lines(self.display, (255, 50, 50, 255), True, [
             (0, 0), (800, 0), (800, 600), (0, 600)], 5)
@@ -134,6 +136,14 @@ class Knot(Polyline):
             res.extend(self.get_points(ptn, count))
         return res
 
+    def set_points(self):
+        super().set_points()
+        self.get_knot(self.points, self.steps)
+
+    def add_point(self, pos):
+        super().add_point(pos)
+        self.get_knot(self.points, self.steps)
+
 
 # =======================================================================================
 # Основная программа
@@ -151,6 +161,8 @@ if __name__ == "__main__":
 
     hue = 0
     color = pygame.Color(0)
+    delay = 0.0
+    delay_step = 0.005
 
     while working:
         for event in pygame.event.get():
@@ -170,6 +182,15 @@ if __name__ == "__main__":
                     show_help = not show_help
                 if event.key == pygame.K_KP_MINUS:
                     k.steps -= 1 if k.steps > 1 else 0
+                if event.key == pygame.K_UP:
+                    # 'true' if True else 'false'
+                    # delay = delay - 1 if delay - 1 >= 0 else 0
+                    delay = delay - delay_step if delay - delay_step >= 0 else 0
+                    # delay = delay - 1
+                    print(delay)
+                if event.key == pygame.K_DOWN:
+                    delay = delay + delay_step
+                    print(delay)
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 k.add_point(event.pos)
@@ -185,6 +206,7 @@ if __name__ == "__main__":
             k.draw_help()
 
         pygame.display.flip()
+        time.sleep(delay)
 
     pygame.display.quit()
     pygame.quit()
