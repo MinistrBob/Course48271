@@ -48,12 +48,6 @@ class AbstractEffect(ABC, Hero):
     def __init__(self, base):
         print("AbstractEffect.__init__")
         self.base = base
-        # self.positive_effects = base.get_positive_effects()
-        # self.negative_effects = base.get_negative_effects()
-        # self.stats = base.get_stats()
-        # self.positive_effects = base.positive_effects.copy()
-        # self.negative_effects = base.negative_effects.copy()
-        # self.stats = base.stats.copy()
 
     @abstractmethod
     def get_positive_effects(self):
@@ -110,15 +104,6 @@ class AbstractNegative(AbstractEffect):
 
 
 class Berserk(AbstractPositive):
-    def __init__(self, base):
-        print("Berserk.__init__")
-        self.base = base
-        # self.positive_effects = base.get_positive_effects()
-        # self.negative_effects = base.get_negative_effects()
-        # self.stats = base.get_stats()
-        # self.positive_effects = base.positive_effects.copy()
-        # self.negative_effects = base.negative_effects.copy()
-        # self.stats = base.stats.copy()
 
     def get_positive_effects(self):
         print("Berserk.get_positive_effects")
@@ -143,10 +128,12 @@ class Berserk(AbstractPositive):
 class Blessing(AbstractPositive):
 
     def get_positive_effects(self):
+        self.positive_effects = self.base.get_positive_effects()
         self.positive_effects.append("Blessing")
         return self.positive_effects
 
     def get_stats(self):
+        self.stats = self.base.get_stats()
         self.stats["Strength"] += 2
         self.stats["Perception"] += 2
         self.stats["Endurance"] += 2
@@ -159,10 +146,12 @@ class Blessing(AbstractPositive):
 
 class Weakness(AbstractNegative):
     def get_negative_effects(self):
+        self.negative_effects = self.base.get_negative_effects()
         self.negative_effects.append("Weakness")
         return self.negative_effects
 
     def get_stats(self):
+        self.stats = self.base.get_stats()
         self.stats["Strength"] -= 4
         self.stats["Endurance"] -= 4
         self.stats["Agility"] -= 4
@@ -170,15 +159,6 @@ class Weakness(AbstractNegative):
 
 
 class Curse(AbstractNegative):
-    def __init__(self, base):
-        print("Curse.__init__")
-        self.base = base
-        # self.positive_effects = base.get_positive_effects()
-        # self.negative_effects = base.get_negative_effects()
-        # self.stats = base.get_stats()
-        # self.positive_effects = base.positive_effects.copy()
-        # self.negative_effects = base.negative_effects.copy()
-        # self.stats = base.stats.copy()
 
     def get_negative_effects(self):
         print("Curse.get_negative_effects")
@@ -201,10 +181,12 @@ class Curse(AbstractNegative):
 
 class EvilEye(AbstractNegative):
     def get_negative_effects(self):
+        self.negative_effects = self.base.get_negative_effects()
         self.negative_effects.append("EvilEye")
         return self.negative_effects
 
     def get_stats(self):
+        self.stats = self.base.get_stats()
         self.stats["Luck"] -= 10
         return self.stats
 
@@ -255,25 +237,25 @@ if __name__ == '__main__':
     assert brs1.get_negative_effects() == []
     # проверим, что в список положительных эффектов был добавлен Berserk
     assert brs1.get_positive_effects() == ['Berserk']
-    print(brs1.stats)
-    print(brs1.negative_effects)
-    print(brs1.positive_effects)
+    print(brs1.get_stats())
+    print(brs1.get_negative_effects())
+    print(brs1.get_positive_effects())
     print("=" * 60)
     # повторное наложение эффекта Berserk
     print("# повторное наложение эффекта Berserk")
     print("brs2 = Berserk(brs1)")
     brs2 = Berserk(brs1)
-    print(brs2.stats)
-    print(brs2.negative_effects)
-    print(brs2.positive_effects)
+    print(brs2.get_stats())
+    print(brs2.get_negative_effects())
+    print(brs2.get_positive_effects())
     print("=" * 60)
     # наложение эффекта Curse
     print("# наложение эффекта Curse")
     print("cur1 = Curse(brs2)")
     cur1 = Curse(brs2)
-    print(cur1.stats)
-    print(cur1.negative_effects)
-    print(cur1.positive_effects)
+    print(cur1.get_stats())
+    print(cur1.get_negative_effects())
+    print(cur1.get_positive_effects())
     print("=" * 60)
     # проверим правильность изменения характеристик
     assert cur1.get_stats() == {'HP': 228,
