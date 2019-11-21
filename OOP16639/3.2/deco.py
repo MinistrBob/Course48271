@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 class AbstractEffect(ABC, Hero):
 
     def __init__(self, base):
