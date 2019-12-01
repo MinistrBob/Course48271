@@ -1,13 +1,5 @@
 import random
 
-"""
-Вам даны шесть классов: EasyMap, EasyObjects, MediumMap, MediumObjects, HardMap, HardObjects. 
-Каждый из классов генерирует карту и список объектов для неё.
-На их основе Вам необходимо создать абстрактную фабрику AbstractLevel 
-c классовыми методами get_map() и get_objects(). 
-Её реализации должны носить имена EasyLevel, MediumLevel и HardLevel.
-"""
-
 
 class AbstractLevel:
 
@@ -145,17 +137,3 @@ class HardLevel(AbstractLevel):
                 self.objects.append((obj_name, coord))
 
             return self.objects
-
-
-if __name__ == '__main__':
-    def create_level(factory):
-        map_ = factory.get_map()
-        objects_ = factory.get_objects()
-        return map_, objects_
-
-
-    level = create_level(HardLevel)
-
-    print(level)
-    print(level[0].get_map())
-    print(level[1].get_objects(level[0]))
