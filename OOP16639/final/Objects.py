@@ -11,6 +11,17 @@ def create_sprite(img, sprite_size):
     return sprite
 
 
+class AbstractObject(ABC):
+
+    @abstractmethod
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def draw(self, display):
+        pass
+
+
 class Interactive(ABC):
 
     @abstractmethod
@@ -19,6 +30,9 @@ class Interactive(ABC):
 
 
 class Ally(AbstractObject, Interactive):
+    """
+    Друг, союзник
+    """
 
     def __init__(self, icon, action, position):
         self.sprite = icon
@@ -123,7 +137,6 @@ class Effect(Hero):
     @abstractmethod
     def apply_effect(self):
         pass
-
 
 # FIXME
 # add classes
