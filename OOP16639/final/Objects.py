@@ -29,10 +29,29 @@ class Interactive(ABC):
         pass
 
 
+class Creature(AbstractObject):
+
+    def draw(self, display):
+        pass
+
+    def __init__(self, icon, stats, position):
+        self.sprite = icon
+        self.stats = stats
+        self.position = position
+        self.calc_max_hp()
+        self.hp = self.max_hp
+
+    def calc_max_hp(self):
+        self.max_hp = 5 + self.stats["endurance"] * 2
+
+
 class Ally(AbstractObject, Interactive):
     """
     Друг, союзник
     """
+
+    def draw(self, display):
+        pass
 
     def __init__(self, icon, action, position):
         self.sprite = icon
@@ -43,20 +62,25 @@ class Ally(AbstractObject, Interactive):
         self.action(engine, hero)
 
 
-class Creature(AbstractObject):
+class Enemy(Creature, Interactive):
 
-    def __init__(self, icon, stats, position):
+    def draw(self, display):
+        pass
+
+    def __init__(self, icon, stats, hp, position):
         self.sprite = icon
         self.stats = stats
         self.position = position
-        self.calc_max_HP()
-        self.hp = self.max_hp
+        self.hp = hp
 
-    def calc_max_HP(self):
-        self.max_hp = 5 + self.stats["endurance"] * 2
+    def interact(self, engine, hero):
+        self.action(engine, hero)
 
 
 class Hero(Creature):
+
+    def draw(self, display):
+        pass
 
     def __init__(self, stats, icon):
         pos = [1, 1]
